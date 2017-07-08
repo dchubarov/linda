@@ -2,23 +2,22 @@ package org.twowls.linda.engine;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * <p>Tests various aspects of DSL composition of L-Systems.</p>
  *
  * @author Dmitry Chubarov
  * @since 1.0.0
  */
-public abstract class DSLTest {
-
-    protected abstract LSystem.Builder builder();
+class DSLTest {
 
     @Test
-    public void testExplodingOutput() {
-        LSystem ls = builder()
+    void testExplodingOutput(LSystem.Builder builder) {
+        LSystem ls = builder
                 .axiom().out("dog").exploding()
                 .build();
 
-        // TODO check if actual output is a sequence of 'd','o','g' not a single symbol 'dog'
-
+        assertEquals("d+o+g", ls.rewrite(0, Interpreters.joining("+")));
     }
 }

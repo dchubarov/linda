@@ -5,4 +5,5 @@
  * @since 1.0.0
  */
 module org.twowls.linda.engine {
+    exports org.twowls.linda.engine;
 }
