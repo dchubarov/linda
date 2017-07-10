@@ -178,6 +178,19 @@ public interface LSystem {
     interface State {
 
         /**
+         * @return number of symbols produced so far.
+         */
+        long seq();
+
+        /**
+         * <p>Tests whether current symbol is equal to {@code symbol}.
+         * Equivalent to {@code Objects.equals(s.sym(), symbol)}.</p>
+         * @param symbol a symbol to compare to.
+         * @return {@code true} if current symbol equals {@code symbol}, otherwise {@code false}.
+         */
+        boolean is(String symbol);
+
+        /**
          * @return the current symbol
          */
         String sym();
