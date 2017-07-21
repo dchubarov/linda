@@ -10,7 +10,7 @@ package org.twowls.linda.engine;
  * @author Dmitry Chubarov
  * @since 1.0.0
  */
-public class LSystemBuilders {
+public final class LSystemBuilders {
 
     /**
      * @return a builder instance for integer symbols.
@@ -33,4 +33,6 @@ public class LSystemBuilders {
         return null;
     }
 
+    /* Prevents instantiation */
+    private LSystemBuilders() {}
 }
