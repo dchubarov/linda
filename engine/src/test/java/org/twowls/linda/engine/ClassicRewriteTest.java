@@ -31,6 +31,7 @@ class ClassicRewriteTest {
         Interpreter<Integer, String> interpreter = Interpreters.joining();
         for (int i = 0; i < words.length; i++) {
             assertEquals(words[i], ls.rewrite(i, interpreter));
+            System.out.println(interpreter.getResult());
         }
     }
 
