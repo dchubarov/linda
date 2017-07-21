@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class DSLTest {
 
     @Test
-    void testExplodingOutput(LSystem.Builder builder) {
-        LSystem ls = builder
+    void testExplodingOutput(StringLSystem.Builder builder) {
+        StringLSystem ls = builder
                 .axiom().out("dog").exploding()
                 .build();
 

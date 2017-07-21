@@ -15,7 +15,7 @@ public final class Interpreters {
      * <p>Creates a simple interpreter that counts up incoming symbols.</p>
      * @return an {@code Interpreter<Long>} instance.
      */
-    public static Interpreter<Long> counting() {
+    public static <S> Interpreter<S, Long> counting() {
         return new Interpreter<>() {
             AtomicLong cnt;
 
@@ -40,7 +40,7 @@ public final class Interpreters {
      * <p>Creates a simple interpreter that joins incoming symbols into a string.</p>
      * @return an {@code Interpreter<String>} instance.
      */
-    public static Interpreter<String> joining() {
+    public static <S> Interpreter<S, String> joining() {
         return joining(null);
     }
 
@@ -49,7 +49,7 @@ public final class Interpreters {
      * @param separator a string separating individual symbols.
      * @return an {@code Interpreter<String>} instance.
      */
-    public static Interpreter<String> joining(String separator) {
+    public static <S> Interpreter<S, String> joining(String separator) {
         return new Interpreter<>() {
             StringBuilder builder;
 
@@ -73,17 +73,17 @@ public final class Interpreters {
 
     /**
      * <p>Creates a simple interpreter that sends incoming symbols to {@code System.out}.</p>
-     * @return an {@code Interpreter<Void>} instance.
+     * @return an {@code Interpreter} instance.
      */
-    public static Interpreter<Void> printing() {
+    public static <S> Interpreter<S, Void> printing() {
         return printing(System.out);
     }
 
     /**
      * <p>Creates a simple interpreter that sends incoming symbols to a given stream.</p>
-     * @return an {@code Interpreter<Void>} instance.
+     * @return an {@code Interpreter} instance.
      */
-    public static Interpreter<Void> printing(PrintStream printStream) {
+    public static <S> Interpreter<S, Void> printing(PrintStream printStream) {
         return new Interpreter<>() {
             @Override
             public void interpret(LSystem.State state) {

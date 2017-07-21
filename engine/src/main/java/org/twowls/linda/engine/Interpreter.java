@@ -7,25 +7,26 @@ import static java.util.Objects.requireNonNull;
  * of a current symbol, its context (neighboring symbols) and state (variables).</p>
  *
  * @param <R> the type of result value
+ * @param <S> the type of a single symbol
  * @see LSystem#rewrite(int, Interpreter)
  *
  * @author Dmitry Chubarov
  * @since 1.0.0
  */
 @FunctionalInterface
-public interface Interpreter<R> {
+public interface Interpreter<S, R> {
 
     /**
      * <p>Invoked by rewriting engine when production is ready and needs to be interpreted.</p>
      * @param state an object containing state of the rewriting process.
      */
-    void interpret(LSystem.State state);
+    void interpret(LSystem.State<S> state);
 
     /**
      * <p>Invoked by rewriting engine before rewriting process start.</p>
      * @param state an object containing initial state of the rewriting process.
      */
-    default void before(LSystem.State state) {
+    default void before(LSystem.State<S> state) {
         // default implementation does not take any action
     }
 
@@ -33,7 +34,7 @@ public interface Interpreter<R> {
      * <p>Invoked by rewriting engine after rewriting process is finished even if no productions were done.</p>
      * @param state an object containing final state of the rewriting process.
      */
-    default void after(LSystem.State state) {
+    default void after(LSystem.State<S> state) {
         // default implementation does not take any action
     }
 
@@ -49,22 +50,22 @@ public interface Interpreter<R> {
      * @param other the other interpreter, must not be {@code null}.
      * @return a combined interpreter instance.
      */
-    default Interpreter<R> andThen(Interpreter<?> other) {
+    default Interpreter<S, R> andThen(Interpreter<S, ?> other) {
         requireNonNull(other);
-        Interpreter<R> self = this;
+        Interpreter<S, R> self = this;
         return new Interpreter<>() {
             @Override
-            public void interpret(LSystem.State state) {
+            public void interpret(LSystem.State<S> state) {
                 self.interpret(state); other.interpret(state);
             }
 
             @Override
-            public void before(LSystem.State state) {
+            public void before(LSystem.State<S> state) {
                 self.before(state); self.before(state);
             }
 
             @Override
-            public void after(LSystem.State state) {
+            public void after(LSystem.State<S> state) {
                 self.after(state); other.after(state);
             }
 

@@ -3,179 +3,166 @@ package org.twowls.linda.engine;
 import java.util.function.Function;
 
 /**
- * <p>Lindenmayer system (L-System) API.</p>
+ * Lindenmayer system (L-System) API.
+ *
+ * @param <S> the type of a single symbol
  *
  * @author Dmitry Chubarov
  * @since 1.0.0
  */
-public interface LSystem {
+public interface LSystem<S> {
 
     /**
-     * <p>Rewrites the current L-System specified number of derivations.</p>
+     * Rewrites the current L-System specified number of derivations.
      * @param derivations number of derivations, must be zero or positive.
      * @param interpreter an object interpreting rewriting result, must not be {@code null}.
      * @param <R> the type of {@code interpreter} result.
      * @return the result of the interpreter.
      */
-    <R> R rewrite(int derivations, Interpreter<R> interpreter);
+    <R> R rewrite(int derivations, Interpreter<S, R> interpreter);
 
     /**
-     * <p>Provides methods allowing building of an <i>L-System</i> in the DSL fashion.</p>
+     * Provides methods allowing building of an <i>L-System</i> in the DSL fashion.
+     * @param <S> the type of a single symbol.
      */
-    interface Builder {
+    interface Builder<S> {
 
         /**
-         * <p>Begins definition of the axiom.</p>
+         * Begins definition of the axiom.
          * @return the current {@code Builder} instance.
          */
-        Builder axiom();
+        Builder<S> axiom();
 
         /**
-         * <p>Begins definition of a named rule.</p>
+         * Begins definition of a named rule.
          * @param symbol a symbol identifying the rule.
          * @return the current {@code Builder} instance.
          */
-        Builder rule(String symbol);
+        Builder<S> rule(S symbol);
 
         /**
-         * <p>Defines one or more variables.</p>
-         * @param symbols variable names
+         * Defines one or more variables.
+         * @param names variable names
          * @return the current {@code Builder} instance.
          */
-        Builder def(String... symbols);
+        Builder<S> def(String... names);
 
         /**
-         * <p>Instructs engine to inject the result of function execution into current scope.</p>
+         * Instructs engine to inject the result of function execution into current scope.
          * @param fn the function to execute
          * @return the current {@code Builder} instance.
          */
-        Builder fun(Function<State, State.Var> fn);
+        Builder<S> fun(Function<State<S>, State.Var> fn);
 
         /**
-         * <p>Instructs engine to pass the value of a variable into current scope.</p>
-         * @param symbol the name of variable.
+         * Instructs engine to pass the value of a variable into current scope.
+         * @param name the name of variable.
          * @return the current {@code Builder} instance.
          */
-        Builder var(String symbol);
+        Builder<S> var(String name);
 
         /**
-         * <p>Instructs engine to inject the fixed boolean value into current scope.</p>
+         * Instructs engine to inject the fixed boolean value into current scope.
          * @param value the value to inject.
          * @return the current {@code Builder} instance.
          */
-        Builder val(boolean value);
+        Builder<S> val(boolean value);
 
         /**
-         * <p>Instructs engine to inject the fixed double value into current scope.</p>
+         * Instructs engine to inject the fixed double value into current scope.
          * @param value the value to inject.
          * @return the current {@code Builder} instance.
          */
-        Builder val(double value);
+        Builder<S> val(double value);
 
         /**
-         * <p>Instructs engine to inject the fixed int value into current scope.</p>
+         * Instructs engine to inject the fixed int value into current scope.
          * @param value the value to inject.
          * @return the current {@code Builder} instance.
          */
-        Builder val(int value);
+        Builder<S> val(int value);
 
         /**
-         * <p>Begins a logical branch of a named rule that gets executed with certain probability.</p>
+         * Begins a logical branch of a named rule that gets executed with certain probability.
          * @param probability the probability, must be in range 0..1 exclusive.
          * @return the current {@code Builder} instance.
          */
-        Builder probably(double probability);
+        Builder<S> probably(double probability);
 
         /**
-         * <p>Begins a logical branch of a named rule that only gets executed if given condition is met.</p>
+         * Begins a logical branch of a named rule that only gets executed if given condition is met.
          * @param fn a function that evaluates a condition against current state of the rewrite process.
          * @return the current {@code Builder} instance.
          */
-        Builder when(Function<State, Boolean> fn);
+        Builder<S> when(Function<State<S>, Boolean> fn);
 
         /**
-         * <p>Begins a logical branch of a named rule that only gets executed if symbol that is currently
-         * being processed precedes the specified sequence of symbols.</p>
-         * @param symbols one of more symbols forming <i>left-context</i> of the current symbol.
+         * Begins a logical branch of a named rule that only gets executed if symbol that is currently
+         * being processed precedes the specified sequence of symbols.
+         * @param symbol one of more symbols forming <i>left-context</i> of the current symbol.
          * @return the current {@code Builder} instance.
          */
-        Builder precedes(String... symbols);
+        Builder<S> precedes(S symbol);
 
         /**
-         * <p>Begins a logical branch of a named rule that only gets executed if symbol that is currently
-         * being processed follows the specified sequence of symbols.</p>
-         * @param symbols one of more symbols forming <i>right-context</i> of the current symbol.
+         * Begins a logical branch of a named rule that only gets executed if symbol that is currently
+         * being processed follows the specified sequence of symbols.
+         * @param symbol one of more symbols forming <i>right-context</i> of the current symbol.
          * @return the current {@code Builder} instance.
          */
-        Builder follows(String... symbols);
+        Builder<S> follows(S symbol);
 
         /**
-         * <p>Specifies one or more symbols that should be ignored during context matching defined
-         * by {@link #precedes(String...)} or {@link #follows(String...)}.</p>
-         * @param symbols one or more symbols to ignore.
+         * Specifies one or more symbols that should be ignored during context matching defined
+         * by {@link #precedes} or {@link #follows}.
+         * @param symbol one or more symbols to ignore.
          * @return the current {@code Builder} instance.
          */
-        Builder skipping(String... symbols);
+        Builder<S> skipping(S symbol);
 
         /**
          *
          * @return the current {@code Builder} instance.
          */
-        Builder not();
+        Builder<S> not();
 
         /**
          *
          * @return the current {@code Builder} instance.
          */
-        Builder and();
+        Builder<S> and();
 
         /**
          *
          * @return the current {@code Builder} instance.
          */
-        Builder or();
+        Builder<S> or();
 
         /**
-         * <p>Begins a branch of a named rule that gets executed if no conditional branch defined
-         * by ({@link #probably(double)}, {@link #when(Function)}, {@link #precedes(String...)},
-         * {@link #follows(String...)}) fit execution conditions.</p>
-         * by {@link #precedes(String...)} or {@link #follows(String...)}.</p>
+         * Begins a branch of a named rule that gets executed if no conditional branch defined
+         * by ({@link #probably(double)}, {@link #when(Function)}, {@link #precedes},
+         * {@link #follows}) fit execution conditions.
          * @return the current {@code Builder} instance.
          */
-        Builder otherwise();
+        Builder<S> otherwise();
 
         /**
-         * <p>Defines a sequence of symbols to be output.</p>
+         * Defines a sequence of symbols to be output.
          * @return the current {@code Builder} instance.
          */
-        Builder out(String... symbols);
+        Builder<S> out(S symbol);
 
         /**
-         * <p>Instructs that last sequence of symbols given by {@link #out(String...)} should be
-         * exploded before output into parts marked by a {@code delimiter}.</p>
-         * @param delimiter the delimiter that separates symbols in a monolithic string.
-         * @return the current {@code Builder} instance.
-         */
-        Builder exploding(String delimiter);
-
-        /**
-         * <p>Instructs that last sequence of symbols given by {@link #out(String...)} should be
-         * exploded into sequence of <i>valid-symbols</i>.</p>
-         * @return the current {@code Builder} instance.
-         */
-        Builder exploding();
-
-        /**
-         * <p>Builds the L-System based on data supplied by invoking other {@code Builder} methods.</p>
+         * Builds the L-System based on data supplied by invoking other {@code Builder} methods.
          * @return the built L-System
          */
-        LSystem build();
+        LSystem<S> build();
     }
 
     /**
-     * <p>Holds state of an executing rewriting process.</p>
+     * Holds state of an executing rewriting process.
      */
-    interface State {
+    interface State<S> {
 
         /**
          * @return number of symbols produced so far.
@@ -183,78 +170,78 @@ public interface LSystem {
         long seq();
 
         /**
-         * <p>Tests whether current symbol is equal to {@code symbol}.
-         * Equivalent to {@code Objects.equals(s.sym(), symbol)}.</p>
+         * Tests whether current symbol is equal to {@code symbol}.
+         * Equivalent to {@code Objects.equals(s.sym(), symbol)}.
          * @param symbol a symbol to compare to.
          * @return {@code true} if current symbol equals {@code symbol}, otherwise {@code false}.
          */
-        boolean is(String symbol);
+        boolean is(S symbol);
 
         /**
          * @return the current symbol
          */
-        String sym();
+        S sym();
 
         /**
-         * <p>Retrieves a variable by its name.</p>
-         * @param symbol the variable name, must not be {@code null}.
+         * Retrieves a variable by its name.
+         * @param name the variable name, must not be {@code null}.
          * @return a {@code Var} representing the variable.
          */
-        Var var(String symbol);
+        Var var(String name);
 
         /**
-         * <p>Updates a variable value.</p>
-         * @param symbol the variable name, must not be {@code null}.
+         * Updates a variable value.
+         * @param name the variable name, must not be {@code null}.
          * @param v a {@code Var} containing new value.
          */
-        void set(String symbol, Var v);
+        void set(String name, Var v);
 
         /**
-         * <p>Wraps a {@code boolean} value into anonymous variable.</p>
+         * Wraps a {@code boolean} value into anonymous variable.
          * @param value the value to be wrapped.
          * @return a {@code Var} containing given value.
          */
         Var wrap(boolean value);
 
         /**
-         * <p>Wraps a {@code double} value into anonymous variable.</p>
+         * Wraps a {@code double} value into anonymous variable.
          * @param value the value to be wrapped.
          * @return a {@code Var} containing given value.
          */
         Var wrap(double value);
 
         /**
-         * <p>Wraps an {@code int} value into anonymous variable.</p>
+         * Wraps an {@code int} value into anonymous variable.
          * @param value the value to be wrapped.
          * @return a {@code Var} containing given value.
          */
         Var wrap(int value);
 
         /**
-         * <p>Represents a variable within a rewrite context.</p>
+         * Represents a variable within a rewrite context.
          */
         interface Var {
 
             /**
-             * <p>Returns variable value as a {@code boolean}.</p>
+             * Returns variable value as a {@code boolean}.
              * @return a {@code boolean} value of the variable.
              */
             boolean booleanVal();
 
             /**
-             * <p>Returns variable value as a {@code double}.</p>
+             * Returns variable value as a {@code double}.
              * @return a {@code double} value of the variable.
              */
             double doubleVal();
 
             /**
-             * <p>Returns variable value as an {@code int}.</p>
+             * Returns variable value as an {@code int}.
              * @return a {@code int} value of the variable.
              */
             int intVal();
 
             /**
-             * <p>Compares this variable's value to the other's.</p>
+             * Compares this variable's value to the other's.
              * @param other a variable to compare this one to.
              * @return zero if variables are equal, negative value if this variable less than the {@code other},
              *  or positive if this variable is greater than the {@code other}.
