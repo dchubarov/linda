@@ -12,9 +12,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class DSLTest {
 
+    enum Alphabet {
+        FIRST,
+        SECOND,
+        DRAW,
+        MOVE,
+        ROLL,
+        TILT
+    }
+
+    void testGenericOutput() {
+        LSystem<Alphabet> ls = LSystemBuilders.<Alphabet>genericSymbols()
+                .rule(Alphabet.SECOND).out(Alphabet.DRAW).out(Alphabet.MOVE)
+                .rule(Alphabet.FIRST).out(Alphabet.SECOND)
+                .axiom().out(Alphabet.SECOND)
+                .build();
+
+    }
     @Test
-    void testExplodingOutput(StringLSystem.Builder builder) {
-        StringLSystem ls = builder
+    void testExplodingOutput() {
+        StringLSystem ls = LSystemBuilders.stringSymbols()
                 .axiom().out("dog").exploding()
                 .build();
 

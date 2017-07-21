@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Test;
 class ParametrizedRewriteTest {
 
     @Test
-    void testSimple(StringLSystem.Builder builder) {
+    void testSimple() {
         // @formatter:off
-        LSystem<String> ls = builder
+        LSystem<String> ls = LSystemBuilders.stringSymbols()
                 .rule("A").def("x", "y")
                     .when(s -> s.var("y").intVal() <= 3)
                         .out("A")

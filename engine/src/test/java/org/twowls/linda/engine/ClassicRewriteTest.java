@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ClassicRewriteTest {
 
     @Test
-    void algae(IntLSystem.Builder builder) {
-        IntLSystem ls = builder
+    void algae() {
+        IntLSystem ls = LSystemBuilders.intSymbols()
                 .rule('a').out('a', 'b')
                 .rule('b').out('a')
                 .axiom().out('a')
@@ -36,8 +36,8 @@ class ClassicRewriteTest {
     }
 
     @Test
-    void fibonacci(IntLSystem.Builder builder) {
-        IntLSystem ls = builder
+    void fibonacci() {
+        IntLSystem ls = LSystemBuilders.intSymbols()
                 .rule(0).out(1)
                 .rule(1).out(0, 1)
                 .axiom().out(0)
